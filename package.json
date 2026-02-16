@@ -1,0 +1,33 @@
+{
+  "name": "sandhiva",
+  "version": "1.0.0",
+  "description": "Cultural Clinical Translator - turns culturally-loaded patient phrases into usable medical meaning",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"No tests specified yet\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohnnyBoy2019/Sandhiva.git"
+  },
+  "keywords": [
+    "medical",
+    "translator",
+    "cultural",
+    "clinical",
+    "healthcare",
+    "multilingual"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/JohnnyBoy2019/Sandhiva/issues"
+  },
+  "homepage": "https://github.com/JohnnyBoy2019/Sandhiva#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
