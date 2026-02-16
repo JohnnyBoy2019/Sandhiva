@@ -628,3 +628,48 @@ canvas {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* Notification Toast */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+    max-width: 400px;
+    font-weight: 500;
+}
+
+.notification-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-info {
+    border-left: 4px solid #667eea;
+    color: #333;
+}
+
+.notification-success {
+    border-left: 4px solid #28a745;
+    color: #155724;
+    background: #d4edda;
+}
+
+.notification-warning {
+    border-left: 4px solid #ffc107;
+    color: #856404;
+    background: #fff3cd;
+}
+
+.notification-error {
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+    background: #f8d7da;
+}

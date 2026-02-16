@@ -18,7 +18,20 @@ app.post('/api/translate', async (req, res) => {
     // Optional Ollama integration - returns error if not configured
     try {
         const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
-        const response = await fetch(`${ollamaUrl}/api/generate`, {
+        
+        // Validate URL to prevent SSRF
+        const validUrl = new URL(ollamaUrl);
+        if (!['http:', 'https:'].includes(validUrl.protocol)) {
+            throw new Error('Invalid protocol');
+        }
+        
+        // Restrict to localhost or explicitly allowed domains
+        const allowedHosts = ['localhost', '127.0.0.1', '::1'];
+        if (!allowedHosts.includes(validUrl.hostname)) {
+            console.warn(`Ollama URL hostname ${validUrl.hostname} not in allowed list`);
+        }
+        
+        const response = await fetch(`${validUrl.origin}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

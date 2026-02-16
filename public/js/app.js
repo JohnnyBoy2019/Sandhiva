@@ -11,7 +11,7 @@ class SandhivaApp {
         this.animationId = null;
         this.isMuted = false;
         this.chatHistory = [];
-        this.visitHistory = []; // For follow-up mode
+        this.visitHistory = []; // Tracks interpretation events across all modes for follow-up comparison
         this.currentInterpretation = null;
         
         this.init();
@@ -274,7 +274,8 @@ class SandhivaApp {
             }
         });
 
-        return matchCount / Math.max(inputWords.length, 1) * 0.7;
+        // Calculate score based on input word count to avoid inflated scores
+        return inputWords.length > 0 ? (matchCount / inputWords.length) * 0.7 : 0;
     }
 
     displayInterpretationEvent(match, score) {
@@ -417,9 +418,25 @@ class SandhivaApp {
         const input = document.getElementById('phraseInput').value.trim();
         
         if (!input) {
-            alert('Please enter a phrase to translate');
+            this.showNotification('Please enter a phrase to translate', 'warning');
             return;
         }
+
+        // Map language codes to full names
+        const languageNames = {
+            'hindi': 'Hindi',
+            'spanish': 'Spanish',
+            'punjabi': 'Punjabi',
+            'urdu': 'Urdu',
+            'bengali': 'Bengali',
+            'tamil': 'Tamil',
+            'telugu': 'Telugu',
+            'gujarati': 'Gujarati',
+            'mandarin': 'Mandarin Chinese',
+            'arabic': 'Arabic'
+        };
+
+        const sourceLang = languageNames[this.currentLanguage] || 'Unknown';
 
         const btn = document.getElementById('literalTranslateBtn');
         const originalText = btn.textContent;
@@ -432,7 +449,7 @@ class SandhivaApp {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: input,
-                    sourceLang: this.currentLanguage === 'hindi' ? 'Hindi' : 'Spanish',
+                    sourceLang: sourceLang,
                     targetLang: 'English'
                 })
             });
@@ -443,14 +460,33 @@ class SandhivaApp {
                 document.getElementById('literalTranslation').style.display = 'block';
                 document.getElementById('literalTranslationText').textContent = data.translation;
             } else {
-                alert(data.message || 'Translation service not available');
+                this.showNotification(data.message || 'Translation service not available', 'warning');
             }
         } catch (error) {
-            alert('Error connecting to translation service. Please ensure Ollama is running.');
+            this.showNotification('Error connecting to translation service. Please ensure Ollama is running.', 'error');
         } finally {
             btn.textContent = originalText;
             btn.disabled = false;
         }
+    }
+
+    showNotification(message, type = 'info') {
+        // Simple in-page notification instead of alert()
+        const existingNotif = document.querySelector('.notification-toast');
+        if (existingNotif) {
+            existingNotif.remove();
+        }
+
+        const notif = document.createElement('div');
+        notif.className = `notification-toast notification-${type}`;
+        notif.textContent = message;
+        document.body.appendChild(notif);
+
+        setTimeout(() => notif.classList.add('show'), 10);
+        setTimeout(() => {
+            notif.classList.remove('show');
+            setTimeout(() => notif.remove(), 300);
+        }, 3000);
     }
 
     // Webcam handling
@@ -463,10 +499,10 @@ class SandhivaApp {
             const video = document.getElementById('providerVideo');
             video.srcObject = this.providerStream;
             
-            alert('Webcam started successfully!');
+            this.showNotification('Webcam started successfully!', 'success');
         } catch (error) {
             console.error('Webcam error:', error);
-            alert('Could not access webcam. Please check permissions.');
+            this.showNotification('Could not access webcam. Please check permissions.', 'error');
         }
     }
 
@@ -495,7 +531,7 @@ class SandhivaApp {
             video.poster = url;
         });
         
-        alert('Sample patient video loaded (placeholder). In production, load actual video file.');
+        this.showNotification('Sample patient video loaded (placeholder). In production, load actual video file.', 'info');
     }
 
     // Pose detection with TensorFlow.js
@@ -530,10 +566,10 @@ class SandhivaApp {
                     poseDetection.SupportedModels.MoveNet,
                     detectorConfig
                 );
-                alert('Pose detection initialized!');
+                this.showNotification('Pose detection initialized!', 'success');
             } catch (error) {
                 console.error('Pose detection error:', error);
-                alert('Could not initialize pose detection');
+                this.showNotification('Could not initialize pose detection', 'error');
                 this.poseDetectionEnabled = false;
             }
         }
