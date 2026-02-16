@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sandhiva - Cultural Clinical Translator</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🏥 Sandhiva</h1>
+            <p class="subtitle">Cultural Clinical Translator</p>
+        </header>
+
+        <!-- Mode Selection Menu -->
+        <nav class="mode-menu">
+            <button class="mode-btn active" data-mode="telemed">📹 Telemedicine</button>
+            <button class="mode-btn" data-mode="triage">🚑 Triage</button>
+            <button class="mode-btn" data-mode="followup">📋 Follow-up</button>
+            <button class="mode-btn" data-mode="transcription">📝 Transcription</button>
+            <button class="mode-btn" data-mode="translator">🌐 Translator</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Video Panel -->
+            <section class="video-panel">
+                <div class="video-container">
+                    <div class="video-wrapper">
+                        <h3>Provider View</h3>
+                        <video id="providerVideo" autoplay playsinline muted></video>
+                        <canvas id="providerCanvas"></canvas>
+                        <div id="providerPose" class="pose-label"></div>
+                    </div>
+                    <div class="video-wrapper">
+                        <h3>Patient View</h3>
+                        <video id="patientVideo" loop playsinline></video>
+                        <canvas id="patientCanvas"></canvas>
+                        <div id="patientPose" class="pose-label"></div>
+                    </div>
+                </div>
+                
+                <!-- Captions -->
+                <div class="captions">
+                    <div class="caption" id="hindiCaption">
+                        <strong>HI:</strong> <span id="hindiText">...</span>
+                    </div>
+                    <div class="caption" id="englishCaption">
+                        <strong>EN:</strong> <span id="englishText">...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bidirectional Chat Panel -->
+            <section class="chat-panel" id="chatPanel">
+                <h3>💬 Conversation</h3>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" placeholder="Type a message..." />
+                    <button id="sendMessageBtn">Send</button>
+                </div>
+            </section>
+
+            <!-- Phrase Input Panel -->
+            <section class="input-panel">
+                <h3>Patient Expression</h3>
+                <div class="language-selector">
+                    <label><input type="radio" name="language" value="hindi" checked> Hindi (हिन्दी)</label>
+                    <label><input type="radio" name="language" value="spanish"> Spanish (Español)</label>
+                    <label><input type="radio" name="language" value="punjabi"> Punjabi (ਪੰਜਾਬੀ)</label>
+                    <label><input type="radio" name="language" value="urdu"> Urdu (اردو)</label>
+                    <label><input type="radio" name="language" value="bengali"> Bengali (বাংলা)</label>
+                    <label><input type="radio" name="language" value="tamil"> Tamil (தமிழ்)</label>
+                    <label><input type="radio" name="language" value="telugu"> Telugu (తెలుగు)</label>
+                    <label><input type="radio" name="language" value="gujarati"> Gujarati (ગુજરાતી)</label>
+                    <label><input type="radio" name="language" value="mandarin"> Mandarin (中文)</label>
+                    <label><input type="radio" name="language" value="arabic"> Arabic (العربية)</label>
+                </div>
+                <input type="text" id="phraseInput" placeholder="Enter patient's phrase or expression..." />
+                <button id="analyzeBtn">🔍 Analyze Phrase</button>
+                <button id="literalTranslateBtn">🤖 Get Literal Translation (Ollama)</button>
+            </section>
+
+            <!-- Interpretation Event Panel -->
+            <section class="interpretation-panel" id="interpretationPanel" style="display: none;">
+                <h2>📊 Interpretation Event</h2>
+                
+                <div class="match-info">
+                    <div class="confidence-bar">
+                        <label>Match Confidence:</label>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="confidenceBar"></div>
+                        </div>
+                        <span id="confidenceText">0%</span>
+                    </div>
+                </div>
+
+                <div class="interpretation-grid">
+                    <!-- Matched Phrase -->
+                    <div class="interpretation-card">
+                        <h3>🎯 Matched Phrase</h3>
+                        <p id="matchedPhrase" class="phrase-text"></p>
+                        <p id="literalMeaning" class="literal-text"></p>
+                    </div>
+
+                    <!-- Top Meanings -->
+                    <div class="interpretation-card">
+                        <h3>💡 Top Meanings</h3>
+                        <ul id="meaningsList"></ul>
+                    </div>
+
+                    <!-- Medical Interpretation -->
+                    <div class="interpretation-card">
+                        <h3>🩺 Medical Interpretation</h3>
+                        <p id="medicalInterpretation"></p>
+                    </div>
+
+                    <!-- Urgency Level -->
+                    <div class="interpretation-card urgency-card">
+                        <h3>⏱️ Urgency Level</h3>
+                        <div id="urgencyLevel" class="urgency-indicator"></div>
+                    </div>
+
+                    <!-- Questions to Ask -->
+                    <div class="interpretation-card">
+                        <h3>❓ Questions to Ask</h3>
+                        <ul id="questionsList"></ul>
+                    </div>
+
+                    <!-- Red Flags -->
+                    <div class="interpretation-card alert">
+                        <h3>⚠️ Red Flags</h3>
+                        <ul id="redFlagsList"></ul>
+                    </div>
+
+                    <!-- Body Part Highlight -->
+                    <div class="interpretation-card">
+                        <h3>🫀 Body Region</h3>
+                        <div id="bodyPartHighlight" class="body-diagram"></div>
+                    </div>
+                </div>
+
+                <!-- Literal Translation Result -->
+                <div id="literalTranslation" class="literal-translation" style="display: none;">
+                    <h3>🤖 Literal Translation (Ollama)</h3>
+                    <p id="literalTranslationText"></p>
+                </div>
+
+                <!-- Visit-Safe Documentation Text -->
+                <div id="documentationText" class="documentation-text" style="display: none;">
+                    <h3>📋 Visit-Safe Documentation</h3>
+                    <div class="doc-box">
+                        <p id="docText"></p>
+                        <button id="copyDocBtn">📋 Copy to Clipboard</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Controls -->
+        <footer class="controls">
+            <button id="startWebcam">📷 Start Webcam</button>
+            <button id="loadSampleVideo">🎬 Load Sample Patient Video</button>
+            <button id="togglePose">👤 Toggle Pose Detection</button>
+            <button id="toggleAudio" class="audio-btn">
+                <span class="audio-icon">🎤</span>
+                <span class="audio-status">Unmuted</span>
+            </button>
+            <div class="mode-info" id="modeInfo">Mode: Telemedicine</div>
+        </footer>
+    </div>
+
+    <!-- Load TensorFlow.js and PoseNet -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0"></script>
+    
+    <!-- Load phrasebank data -->
+    <script src="/data/phrasebank.js"></script>
+    
+    <!-- Load main application -->
+    <script src="/js/app.js"></script>
+</body>
+</html>
